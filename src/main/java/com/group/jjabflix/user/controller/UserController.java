@@ -48,8 +48,8 @@ public class UserController {
     }
 
     @GetMapping("/users/{userId}")
-    public void getUser(@PathVariable Long userId) throws Exception {
-//        return userService.getUser(userId);
+    public void getUser(@PathVariable Long userId) {
+
     }
 
     @PutMapping("/users/{userId}")

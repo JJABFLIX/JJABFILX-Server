@@ -7,8 +7,6 @@ import com.group.jjabflix.user.dao.UserMapper;
 import com.group.jjabflix.user.dto.UserSignUpRequestDto;
 import com.group.jjabflix.user.vo.User;
 import com.group.jjabflix.user.vo.UserDto;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

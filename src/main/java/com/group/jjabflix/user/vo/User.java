@@ -21,7 +21,7 @@ public class User {
     private String phoneNumber;
     private String name;
     private String birth;
-    private String membership;
+    private Membership membership;
     private UserStatus status;
 
     private String cardNumber;
@@ -44,9 +44,5 @@ public class User {
 
     public void encodePassword(PasswordEncoder passwordEncoder) {
         this.password = passwordEncoder.encode(password);
-    }
-
-    public void checkPassword() {
-
     }
 }
