@@ -1,12 +1,11 @@
 package com.group.jjabflix.user.controller;
 
-import com.group.jjabflix.user.SuccessResponse;
-import com.group.jjabflix.user.dto.UserSignUpRequestDto;
+import com.group.jjabflix.config.security.jwt.TokenInfoResponse;
+import com.group.jjabflix.user.dto.UserLoginRequestDto;
+import com.group.jjabflix.user.dto.UserSignupRequestDto;
 import com.group.jjabflix.user.service.UserService;
-import com.group.jjabflix.user.vo.UserDto;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,24 +16,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@Slf4j
 @RequestMapping("/api/v1")
 public class UserController {
 
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
     @PostMapping("/auth/login")
-    public String login(@RequestBody UserDto userDto) throws Exception {
-        return userService.login(userDto);
+    public ResponseEntity<TokenInfoResponse> login(@RequestBody UserLoginRequestDto requestDto)
+        throws Exception {
+        return userService.login(requestDto);
     }
 
     @PostMapping("/auth/signup")
-    public SuccessResponse signup(@RequestBody UserSignUpRequestDto requestDto) throws Exception {
-        return userService.signup(requestDto);
+    public void signup(@RequestBody UserSignupRequestDto requestDto) throws Exception {
+        userService.signup(requestDto);
     }
 
     @PostMapping("/auth/logout")

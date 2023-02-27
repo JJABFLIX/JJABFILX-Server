@@ -1,15 +1,14 @@
 package com.group.jjabflix.user.service;
 
-import com.group.jjabflix.user.SuccessResponse;
-import com.group.jjabflix.user.dto.UserSignUpRequestDto;
-import com.group.jjabflix.user.vo.User;
-import com.group.jjabflix.user.vo.UserDto;
+import com.group.jjabflix.config.security.jwt.TokenInfoResponse;
+import com.group.jjabflix.user.dto.UserLoginRequestDto;
+import com.group.jjabflix.user.dto.UserSignupRequestDto;
+import org.springframework.http.ResponseEntity;
 
 public interface UserService {
 
-    SuccessResponse signup(UserSignUpRequestDto requestDto) throws Exception;
+    void signup(UserSignupRequestDto requestDto) throws Exception;
 
-    String login(UserDto userDto) throws Exception;
+    ResponseEntity<TokenInfoResponse> login(UserLoginRequestDto requestDto) throws Exception;
 
-    User getUser(Long userId) throws Exception;
 }

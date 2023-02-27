@@ -1,80 +1,64 @@
 package com.group.jjabflix.user.service;
 
-import com.group.jjabflix.config.JwtTokenProvider;
-import com.group.jjabflix.user.ResponseMessage;
-import com.group.jjabflix.user.SuccessResponse;
+import com.group.jjabflix.config.security.jwt.JwtProvider;
+import com.group.jjabflix.config.security.jwt.TokenInfoResponse;
+import com.group.jjabflix.error.ErrorCode;
 import com.group.jjabflix.user.dao.UserMapper;
-import com.group.jjabflix.user.dto.UserSignUpRequestDto;
+import com.group.jjabflix.user.dto.UserLoginRequestDto;
+import com.group.jjabflix.user.dto.UserSignupRequestDto;
+import com.group.jjabflix.user.exception.EmailDuplicationException;
+import com.group.jjabflix.user.exception.NotFoundUserException;
 import com.group.jjabflix.user.vo.User;
-import com.group.jjabflix.user.vo.UserDto;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    private UserMapper userMapper;
-
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
-
-    @Autowired
+    private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-
+    private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final JwtProvider jwtProvider;
 
     @Transactional
     @Override
-    public SuccessResponse signup(UserSignUpRequestDto requestDto) throws Exception {
+    public void signup(UserSignupRequestDto requestDto) throws Exception {
         if (userMapper.selectUserByEmail(requestDto.getEmail()) != null) {
-            throw new Exception("이미 존재하는 이메일입니다");
+            throw new EmailDuplicationException(ErrorCode.EMAIL_DUPLICATION);
         }
 
         User user = requestDto.toUser();
         user.encodePassword(passwordEncoder);
 
         userMapper.insertUser(user);
-
-        return new SuccessResponse(HttpStatus.OK.value(), ResponseMessage.SIGNUP_SUCCESS);
     }
 
+    @Transactional
     @Override
-    public String login(UserDto userDto) throws Exception {
-//        User user = userMapper.selectUserByEmail(userDto.getEmail());
-//
-//        if (user == null) {
-//            throw new Exception();
-//        }
-//
-//        String password = userDto.getPassword();
-//        if (!user.getPassword().equals(password)) {
-//            throw new IllegalArgumentException("잘못된 비밀번호입니다.");
-//        }
-//
-//        List<String> roles = new ArrayList<>();
-//        roles.add(user.getRole().name());
-//
-//        return jwtTokenProvider.createToken(user.getEmail(), roles);
-        // 응답 response 객체도만들고
-        // exception handller 만들고
-
-    }
-
-    @Override
-    public User getUser(Long userId) throws Exception {
-        User user = userMapper.selectUserDetail(userId);
-
-        if (user == null) {
-            throw new Exception();
+    public ResponseEntity<TokenInfoResponse> login(UserLoginRequestDto requestDto)
+        throws Exception {
+        if (userMapper.selectUserByEmail(requestDto.getEmail()) == null) {
+            throw new NotFoundUserException(ErrorCode.NOT_FOUND_USER);
         }
 
-        return user;
+        UsernamePasswordAuthenticationToken authenticationToken
+            = new UsernamePasswordAuthenticationToken(requestDto.getEmail(),
+            requestDto.getPassword());
+
+        Authentication authentication = authenticationManagerBuilder.getObject()
+            .authenticate(authenticationToken);
+
+        TokenInfoResponse tokenInfoResponse = jwtProvider.generateToken(authentication);
+
+        return ResponseEntity.status(HttpStatus.OK).body(tokenInfoResponse);
     }
+
 }
