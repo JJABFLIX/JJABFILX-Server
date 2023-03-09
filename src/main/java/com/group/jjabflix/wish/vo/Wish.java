@@ -16,4 +16,9 @@ public class Wish {
     private long contentId;
     private LocalDateTime createdAt;
 
+    public Wish(long profileId, long contentId) {
+        this.profileId = profileId;
+        this.contentId = contentId;
+    }
+
 }
