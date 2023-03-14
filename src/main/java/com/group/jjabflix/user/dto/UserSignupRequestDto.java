@@ -11,7 +11,7 @@ import lombok.ToString;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserSignupRequestDto {
+public class UserSignUpRequestDto {
 
     private String email;
     private String password;
